@@ -35,12 +35,8 @@ class UserPlugin extends Yaf_Plugin_Abstract {
 	}
 
 	public function dispatchLoopShutdown(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
+		print_r($response);die;
 		echo "Plugin DispatchLoopShutdown called <br/>\n";
-	}
-
-	public function preResponse(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		echo "Plugin PreResponse called <br/>\n";
-		echo "Response is ready to send<br/>\n";
 	}
 
 }

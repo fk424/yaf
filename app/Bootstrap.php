@@ -15,56 +15,37 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 
 	public function _initConfig() {
 		$config = Yaf_Application::app()->getConfig();
+		$conf_arr = $config->toArray();
+		foreach ($config->include as $ini)
+		{
+			$config = new Yaf_Config_Ini(BASE_PATH.'conf/'.$ini.'.ini');
+			$conf_arr[$ini] = $config->toArray();
+		}
+		$config = new Yaf_Config_Ini($conf_arr);
 		Yaf_Registry::set("config", $config);
 	}
 
-	public function _initLocalName() {
-		Yaf_Loader::getInstance()->registerLocalNamespace(array(
-			'Smarty', 'Foo',
-		));
+	public function _initLibrary() {
+		require_once(APPLICATION_PATH . '/library/DjApiErrorDescs.php');
 	}
 
 	public function _initPlugin(Yaf_Dispatcher $dispatcher) {
-		//$dispatcher->setErrorHandler(array($this, 'error'));
-		echo "_initPlugin call first<br/>\n";
-		/**
-		 * register a plugin
-		 */
 		$user = new UserPlugin();
-		$dispatcher->registerPlugin($user);
+//		$dispatcher->registerPlugin($user);
+	}
+	public function _initRedis() {
+		$redis = new CRedis();
+		$redis->init();
+		Yaf_Registry::set("redis", $redis->getInstance());
 	}
 
-	public function _initRoute(Yaf_Dispatcher $dispatcher) {
-		echo "_initRoute call second<br/>\n";
-		$router = Yaf_Dispatcher::getInstance()->getRouter();
-		/**
-		 * add the routes defined in ini config file
-		 */
-//		$router->addConfig(Yaf_Registry::get("config")->routes);
-//		$router->addConfig(Yaf_Registry::get("config")->admin);
-		/**
-		 * test this route by access http://yourdomain.com/product/list/?/?/
-		 */
-/*		$route  = new Yaf_Route_Rewrite(
-			"/product/list/:id/:name",
-			array(
-				"controller" => "product",
-				"action"	 => "info",
-			)
-		);
-
-		$router->addRoute('dummy', $route);
-*/
+	public function _initParams() {
+		$params = $_GET + $_POST;
+		Yaf_Registry::set("params", $params);
 	}
 
-	public function _initDefaultName(Yaf_Dispatcher $dispatcher) {
-		echo "_initDefaultName call last<br/>\n";
-		/**
-		 * actully this is unecessary, since all the parameters here is the default value of Yaf
-		 */
-		$dispatcher->setDefaultModule("Index")->setDefaultController("Index")->setDefaultAction("index");
-	}
 	public function _initView(Yaf_Dispatcher $dispatcher) {
 		$dispatcher->disableView();
-        }
+        header('Content-type: application/json;charset=utf-8');
+    }
 }
