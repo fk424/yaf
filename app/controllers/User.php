@@ -21,7 +21,8 @@ class UserController extends Yaf_Controller_Abstract {
              'errno' => DJAPI_EC_SUCCESS,
              'data' => $channel
         );
-        echo json_encode($return);
+        $this->getView()->assign("errno", DJAPI_EC_SUCCESS);
+        $this->getView()->assign("data", $channel);
 	}
 
     /**
@@ -43,11 +44,9 @@ class UserController extends Yaf_Controller_Abstract {
         )));
         $userInfo['allowDomain'] = $allowDomain;
 
-        $return =  array(
-            'errno' => DJAPI_EC_SUCCESS,
-            'data' => $userInfo,
-        );
-        echo json_encode($return);
+        $this->getView()->assign("errno", DJAPI_EC_SUCCESS);
+        $this->getView()->assign("data", $channel);
+
     }
 
 }
