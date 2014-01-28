@@ -7,11 +7,17 @@
  */
 class Bootstrap extends Yaf_Bootstrap_Abstract{
 
+	public static $_logger;
 	public function _initConst()
 	{
 		defined('YII_ENABLE_EXCEPTION_HANDLER') or define('YII_ENABLE_EXCEPTION_HANDLER',true);
 		defined('YII_ENABLE_ERROR_HANDLER') or define('YII_ENABLE_ERROR_HANDLER',true);
 		defined('YII_DEBUG') or define('YII_DEBUG',true);
+		defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
+	}
+	public function _initLogger()
+	{
+		$_logger = new CLogger();
 	}
 	protected function _initSystemHandlers()
 	{
@@ -80,7 +86,7 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 		if(isset($_SERVER['HTTP_REFERER']))
 			$message.="\nHTTP_REFERER=".$_SERVER['HTTP_REFERER'];
 		$message.="\n---";
-//		Yii::log($message,CLogger::LEVEL_ERROR,$category);
+		$this->log($message,CLogger::LEVEL_ERROR,$category);
 
 		try
 		{
@@ -185,6 +191,27 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 		}
 	}
 
+
+	public static function log($msg,$level=CLogger::LEVEL_INFO,$category='application')
+	{
+		if(self::$_logger===null)
+			self::$_logger=new CLogger;
+		if(YII_DEBUG && YII_TRACE_LEVEL>0 && $level!==CLogger::LEVEL_PROFILE)
+		{
+			$traces=debug_backtrace();
+			$count=0;
+			foreach($traces as $trace)
+			{
+				if(isset($trace['file'],$trace['line']) && strpos($trace['file'],BASE_PATH)!==0)
+				{
+					$msg.="\nin ".$trace['file'].' ('.$trace['line'].')';
+					if(++$count>=YII_TRACE_LEVEL)
+						break;
+				}
+			}
+		}
+		self::$_logger->log($msg,$level,$category);
+	}
 	public function onException($event)
 	{
 		$this->raiseEvent('onException',$event);
@@ -284,4 +311,19 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 			echo '<p>'.$exception->getMessage().'</p>';
 		}
 	}
+
+	public function end($status=0,$exit=true)
+	{
+		if($this->hasEventHandler('onEndRequest'))
+			$this->onEndRequest(new CEvent($this));
+		if($exit)
+			exit($status);
+	}
+
+	public function hasEventHandler($name)
+	{
+		$name=strtolower($name);
+		return isset($this->_e[$name]) && $this->_e[$name]->getCount()>0;
+	}
+
 }
