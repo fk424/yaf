@@ -45,7 +45,7 @@ class UserController extends Yaf_Controller_Abstract {
         $userInfo['allowDomain'] = $allowDomain;
 
         $this->getView()->assign("errno", DJAPI_EC_SUCCESS);
-        $this->getView()->assign("data", $channel);
+        $this->getView()->assign("data", $userInfo1);
 
     }
 
