@@ -6,37 +6,52 @@
 class UserPlugin extends Yaf_Plugin_Abstract {
 
 	public function routerStartup(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		echo "Plugin routerStartup called <br/>\n";
+//		echo "Plugin routerStartup called <br/>\n";
 
-		echo "Request with base uir:" . $request->getBaseUri() . "<br/>\n";
+//		echo "Request with base uir:" . $request->getBaseUri() . "<br/>\n";
 
-		echo "Request with request uri:" .$request->getRequestUri() . "<br/>\n";
+//		echo "Request with request uri:" .$request->getRequestUri() . "<br/>\n";
 	}
 
 	public function routerShutdown(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		echo "Plugin routerShutdown called <br/>\n";
-		echo "Request routed result:" ;
-		print_r($request);
-		echo "<br/>\n";
-		echo "Functional route:" . Yaf_Dispatcher::getInstance()->getRouter()->getCurrentRoute();
-		echo "<br/>\n";
+//		echo "Plugin routerShutdown called <br/>\n";
+//		echo "Request routed result:" ;
+//		print_r($request);
+//		echo "<br/>\n";
+//		echo "Functional route:" . Yaf_Dispatcher::getInstance()->getRouter()->getCurrentRoute();
+//		echo "<br/>\n";
 	}
 
 	public function dispatchLoopStartup(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		echo "Plugin DispatchLoopStartup called <br/>\n";
+//		echo "Plugin DispatchLoopStartup called <br/>\n";
 	}
 
 	public function preDispatch(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		echo "Plugin PreDispatch called <br/>\n";
+//		$params = $_GET + $_POST;
+		$params = $request->getQuery() + $request->getPost();
+		$params = $params + Yaf_Dispatcher::getInstance()->getRequest()->getParams();
+		Yaf_Registry::set("params", $params);
+//		echo "Plugin PreDispatch called <br/>\n";
 	}
 
 	public function postDispatch(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		echo "Plugin postDispatch called <br/>\n";
+//		echo "Plugin postDispatch called <br/>\n";
 	}
 
 	public function dispatchLoopShutdown(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		print_r($response);die;
-		echo "Plugin DispatchLoopShutdown called <br/>\n";
+		$method = $request->getMethod();
+		switch ($method) {
+			case 'CLI':
+				break;
+			case 'TEST':
+				break;
+			default:
+				header('Content-type: application/json;charset=utf-8');
+				break;
+		}
+
+//		print_r($response);die;
+//		echo "Plugin DispatchLoopShutdown called <br/>\n";
 	}
 
 }

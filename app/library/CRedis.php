@@ -24,7 +24,9 @@ class CRedis
     }
     public function init()
     {
-        $config = Yaf_Registry::get("config")->redis;
+        $config = new Yaf_Config_Simple(include(CONFIG_PATH . '/redis.php'));
+        Yaf_Registry::set("redis_config", $config);
+
         if ($conf = $config->host) {
             if ($this->connect($conf['host'], $conf['port'], $conf['timeout'])) {
                 Yii::log('redis connect to stat:' . print_r($conf, true));

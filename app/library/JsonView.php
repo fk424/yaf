@@ -22,7 +22,7 @@ class JsonView implements Yaf_View_Interface
     }
 
     public function display($name, $value = NULL) {
-        echo json_encode($this->data);
+        echo render($name);
     }
 
 }

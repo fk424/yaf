@@ -7,8 +7,10 @@
 class UserController extends Yaf_Controller_Abstract {
 
 	public function getChannelTypeAction() {
-		$params = $_GET;
-		$userId = isset($params['userId']) ? $params['userId'] : 0;
+        $params = Yaf_Registry::get("params");
+        $userId = $params['userId'];
+        $userId = Checker::assert_empty($userId, EAPI_PARAM_USER_ID_NULL);
+        $userId = Checker::assert_int($userId, EAPI_PARAM_USER_ID_INVALID);
 
         $model = UserModel::getInstance();
 
@@ -17,11 +19,7 @@ class UserController extends Yaf_Controller_Abstract {
             $channel = implode('|', $channel);
         }
 
-        $return = array(
-             'errno' => DJAPI_EC_SUCCESS,
-             'data' => $channel
-        );
-        $this->getView()->assign("errno", DJAPI_EC_SUCCESS);
+        $this->getView()->assign("errno", EAPI_SUCCESS);
         $this->getView()->assign("data", $channel);
 	}
 
@@ -30,12 +28,15 @@ class UserController extends Yaf_Controller_Abstract {
      */
     public function getDetailAction ()
     {
-        $params = $_GET;
+        $params = Yaf_Registry::get("params");
+
         $userId = isset($params['userId']) ? $params['userId'] : 0;
+        $userId = Checker::assert_empty($userId, EAPI_PARAM_USER_ID_NULL);
+        $userId = Checker::assert_int($userId, EAPI_PARAM_USER_ID_INVALID);
 
         $model = new UserModel();
 
-        $userInfo = $model->getUserInfo($userId);
+        $userInfo = $model->cached('getUserInfo', $userId);
         $website = trim(str_replace(";", ",", $userInfo["website"]), ",");
         $allowwebsite = trim(str_replace(";", ",", $userInfo["allowwebsite"]), ",");
         $allowDomain = implode(",", array_filter(array(
@@ -44,8 +45,8 @@ class UserController extends Yaf_Controller_Abstract {
         )));
         $userInfo['allowDomain'] = $allowDomain;
 
-        $this->getView()->assign("errno", DJAPI_EC_SUCCESS);
-        $this->getView()->assign("data", $userInfo1);
+        $this->getView()->assign("errno", EAPI_SUCCESS);
+        $this->getView()->assign("data", $userInfo);
 
     }
 

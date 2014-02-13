@@ -1,7 +1,12 @@
 <?php
 
-class UserModel
+class UserModel extends ModelDj
 {
+    private $_cache_rule = array(
+        'getUserInfo'=> 'detail',
+        );
+    private $_key_prefix = 'user';
+
     static protected $_model;
 
     const SEARCH_TEXT = 1;
@@ -25,30 +30,19 @@ class UserModel
 
     public function getUserInfo($uid)
     {
-        $key = 'eapi:user:detail:' . $uid;
-        $redis = Yaf_Registry::get('redis');
-        $userInfo = $redis->get($key);
+        $postData = array(
+            'userID' => $uid
+        );
 
-        if ($userInfo) {
-            $userInfo = unserialize($userInfo);
+        $res = Utility::edcApiPost('eapi/SearchUser', $postData);
+        if ($res['errno'] != 0) {
+            throw new DjApiException(80101);
         }
+        $userInfo = $res['msg']['data'];
 
-        if (empty($userInfo)) {
-            $postData = array(
-                'userID' => $uid
-            );
-
-            $res = Utility::edcApiPost('eapi/SearchUser', $postData);
-            if ($res['errno'] != 0) {
-                throw new DjApiException(80101);
-            }
-            $userInfo = $res['msg']['data'];
-
-            if ($userInfo) {
-                $redis->setex($key, 7 * 24 * 60 * 60, serialize($userInfo));
-            }
+        if (!$userInfo) {
+            throw new DjApiException(EAPI_USER_NOT_EXIST);
         }
-
         return $userInfo;
     }
 
@@ -70,6 +64,9 @@ class UserModel
                             $channel[] = $row['ctype'];
                         }
                     }
+                } else {
+                    $this->getUserInfo($uid);
+                    $channel[] = 1;
                 }
             }
 

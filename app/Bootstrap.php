@@ -17,25 +17,25 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 	}
 	protected function _initSystemHandlers()
 	{
-		ErrorHandler::initHandler();
+//		ErrorHandler::initHandler();
 	}
 
 	public function _initSession($dispatcher) {
 		/*
 		 * start a session 
 		 */
-		Yaf_Session::getInstance()->start();
+//		Yaf_Session::getInstance()->start();
 	}
 
 	public function _initConfig() {
 		$config = Yaf_Application::app()->getConfig();
-		$conf_arr = $config->toArray();
-		foreach ($config->include as $ini)
-		{
-			$config = new Yaf_Config_Ini(BASE_PATH.'conf/'.$ini.'.ini');
-			$conf_arr[$ini] = $config->toArray();
-		}
-		$config = new Yaf_Config_Ini($conf_arr);
+//		$conf_arr = $config->toArray();
+//		foreach ($config->include as $ini)
+//		{
+//			$config = new Yaf_Config_Ini(BASE_PATH.'conf/'.$ini.'.ini');
+//			$conf_arr[$ini] = $config->toArray();
+//		}
+//		$config = new Yaf_Config_Ini($conf_arr);
 		Yaf_Registry::set("config", $config);
 	}
 
@@ -45,7 +45,7 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 
 	public function _initPlugin(Yaf_Dispatcher $dispatcher) {
 		$user = new UserPlugin();
-//		$dispatcher->registerPlugin($user);
+		$dispatcher->registerPlugin($user);
 	}
 	public function _initRedis() {
 		$redis = new CRedis();
@@ -54,8 +54,11 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 	}
 
 	public function _initParams() {
+/*
 		$params = $_GET + $_POST;
+		$params = $params + Yaf_Dispatcher::getInstance()->getRequest()->getParams();
 		Yaf_Registry::set("params", $params);
+*/
 	}
 
 	public function _initView(Yaf_Dispatcher $dispatcher) {
