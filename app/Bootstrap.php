@@ -21,21 +21,11 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 	}
 
 	public function _initSession($dispatcher) {
-		/*
-		 * start a session 
-		 */
 //		Yaf_Session::getInstance()->start();
 	}
 
 	public function _initConfig() {
 		$config = Yaf_Application::app()->getConfig();
-//		$conf_arr = $config->toArray();
-//		foreach ($config->include as $ini)
-//		{
-//			$config = new Yaf_Config_Ini(BASE_PATH.'conf/'.$ini.'.ini');
-//			$conf_arr[$ini] = $config->toArray();
-//		}
-//		$config = new Yaf_Config_Ini($conf_arr);
 		Yaf_Registry::set("config", $config);
 	}
 
@@ -53,18 +43,9 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 		Yaf_Registry::set("redis", $redis->getInstance());
 	}
 
-	public function _initParams() {
-/*
-		$params = $_GET + $_POST;
-		$params = $params + Yaf_Dispatcher::getInstance()->getRequest()->getParams();
-		Yaf_Registry::set("params", $params);
-*/
-	}
-
 	public function _initView(Yaf_Dispatcher $dispatcher) {
     	$view= new JsonView();
     	Yaf_Dispatcher::getInstance()->setView($view);
     }
-
 
 }

@@ -135,7 +135,7 @@ class Utility
             'c' => $table,
             'g' => 'eapi_monitor_mailonly'
         );
-        Yii::app()->curl->run($mailApi, false, $data);
+        Curl::run($mailApi, false, $data);
         return true;
     }
 

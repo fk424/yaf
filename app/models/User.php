@@ -2,10 +2,15 @@
 
 class UserModel extends ModelDj
 {
-    private $_cache_rule = array(
+    protected $_cache_map = array(
         'getUserInfo'=> 'detail',
+        'getChannel'=> 'channel',
         );
-    private $_key_prefix = 'user';
+    protected $_cache_func = array(
+        'getUserInfo_cache',
+        'getChannel_cache',
+        );
+    protected $_key_prefix = 'user';
 
     static protected $_model;
 
@@ -21,12 +26,6 @@ class UserModel extends ModelDj
     public $show_type = array(self::SHOW_TEXT, self::SHOW_IMG, self::SHOW_GOODS, self::SHOW_TUAN);
     public $assist_type = array(self::ASSIST_SEARCH);
 
-    public static function getInstance() {
-        if(!(self::$_model instanceof self)){
-            self::$_model = new self;
-        }
-        return self::$_model;
-    }
 
     public function getUserInfo($uid)
     {
@@ -48,32 +47,23 @@ class UserModel extends ModelDj
 
     public function getChannel($uid)
     {
-        $key = 'eapi:user:channel:' . $uid;
-        $redis = Yaf_Registry::get('redis');
-        $channel = $redis->get($key);
-        $channel = unserialize($channel);
-
-        if (empty($channel)) {
-            $channel = array();
-            $edcData = array('userID' => $uid);
-            $res = Utility::edcApiPost('user/searchExt', $edcData);
-            if ($res['errno'] == 0) {
-                if ($res['msg']['channels'] && is_array($res['msg']['channels'])) {
-                    foreach ($res['msg']['channels'] as $row) {
-                        if (in_array($row['ctype'], array(self::SEARCH_TEXT, self::SEARCH_GOODS, self::SHOW_TEXT, self::SHOW_IMG, self::SHOW_GOODS, self::SHOW_TUAN, self::ASSIST_SEARCH))) {
-                            $channel[] = $row['ctype'];
-                        }
+        $channel = array();
+        $edcData = array('userID' => $uid);
+        $res = Utility::edcApiPost('user/searchExt', $edcData);
+        if ($res['errno'] == 0) {
+            if ($res['msg']['channels'] && is_array($res['msg']['channels'])) {
+                foreach ($res['msg']['channels'] as $row) {
+                    if (in_array($row['ctype'], array(self::SEARCH_TEXT, self::SEARCH_GOODS, self::SHOW_TEXT, self::SHOW_IMG, self::SHOW_GOODS, self::SHOW_TUAN, self::ASSIST_SEARCH))) {
+                        $channel[] = $row['ctype'];
                     }
-                } else {
-                    $this->getUserInfo($uid);
-                    $channel[] = 1;
                 }
+            } else {
+                $this->getUserInfo($uid);
+                $channel[] = 1;
             }
-
-            $channel = array_unique($channel);
-
-            $redis->setex($key, 7 * 24 * 60 * 60, serialize($channel));
         }
+
+        $channel = array_unique($channel);
 
         return $channel;
     }
@@ -100,6 +90,27 @@ class UserModel extends ModelDj
             }
         }
     }
+
+    public function updateDetail($intUserId, $data)
+    {
+        $data['user_id'] = $intUserId;
+        $res = Utility::edcApiPost('edc/user/updatebyid', $data);
+
+        if ($res['errno'] == 0) {
+            $redis = Yii::app()->openApiMaster;
+            $key = 'eapi_user_detail_' . $intUserId;
+            $redis->delete($key);
+
+            return array(
+                'errno' => DJAPI_EC_SUCCESS,
+                'data' => array(
+                    'affectedRecords' => 1
+                )
+            );
+        }
+        throw new DjApiException(DJAPI_EC_DATABASE);
+    }
+
 
 }
 
