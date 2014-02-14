@@ -28,6 +28,7 @@ abstract class ModelDj {
 				break;
 			case "decache":
 				$ret = $this->decache($func, $args);
+				break;
 			default:
 				throw new Yaf_Exception('model function: '.$name." not exist");
 				break;
@@ -61,8 +62,6 @@ abstract class ModelDj {
 
 	private function decache($func, $args = array())
 	{
-		$ttl = $this->_ttl;
-
 		if (!is_array($args)) {
 			$args = array($args);
 		}
@@ -70,13 +69,9 @@ abstract class ModelDj {
 
 		if (!is_null($key) && Yaf_Application::app()->getConfig()->enableCache) {
 			$redis = Yaf_Registry::get('redis');
-        	$data = $redis->get($key);
-            $data = unserialize($data);
 
-			if (!$data) {
-				$data = call_user_func_array(array($this, $func), $args);
-				$redis->setex($key, $ttl, serialize($data));
-			}
+			$data = call_user_func_array(array($this, $func), $args);
+			$redis->delete($key);
 		} else {
 			$data = call_user_func_array(array($this, $func), $args);
 		}

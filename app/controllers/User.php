@@ -6,13 +6,12 @@
  */
 class UserController extends Yaf_Controller_Abstract {
 
+
 	public function getChannelTypeAction() {
-        $params = Yaf_Registry::get("params");
-        $userId = $params['userId'];
-        $userId = Checker::assert_empty($userId, EAPI_PARAM_USER_ID_NULL);
+        $userId = Checker::getParam('userId', EAPI_PARAM_USER_ID_NULL);
+
         $userId = Checker::assert_int($userId, EAPI_PARAM_USER_ID_INVALID);
 
-//        $model = new UserModel();
         $model = UserModel::getInstance();
 
         $channel = $model->getChannel_cache($userId);
@@ -29,10 +28,8 @@ class UserController extends Yaf_Controller_Abstract {
      */
     public function getDetailAction ()
     {
-        $params = Yaf_Registry::get("params");
+        $userId = Checker::getParam('userId', EAPI_PARAM_USER_ID_NULL);
 
-        $userId = isset($params['userId']) ? $params['userId'] : 0;
-        $userId = Checker::assert_empty($userId, EAPI_PARAM_USER_ID_NULL);
         $userId = Checker::assert_int($userId, EAPI_PARAM_USER_ID_INVALID);
 
         $model = UserModel::getInstance();
@@ -51,48 +48,33 @@ class UserController extends Yaf_Controller_Abstract {
 
     }
 
-    public function updateUserDetailAction()
+    public function updateAction()
     {
-        $params = Yaf_Registry::get("params");
-        $userId = isset($params['userId']) ? $params['userId'] : 0;
-        $userId = Checker::assert_empty($userId, EAPI_PARAM_USER_ID_NULL);
+        $userId = Checker::getParam('userId', EAPI_PARAM_USER_ID_NULL);
+
         $userId = Checker::assert_int($userId, EAPI_PARAM_USER_ID_INVALID);
 
+        $params = Yaf_Registry::get("params");
 
-        $postData = array(
-            'userID' => $userId
-        );
+        $params = UserModel::checkParams($params);
 
-        $post = $params;
+        $status = Checker::getParam('userId', EAPI_PARAM_USER_ID_NULL);
 
         $model = UserModel::getInstance();
-var_dump($model);die;
-        $model->updateDetail($userId, $post);
+        $model->updateDetail_decache($userId, $params);
 
-        if ($post['user_channel']) {
-            $this->_updateUserChannel($intUserId, $post['user_channel']);
-        }
+        // if ($post['user_channel']) {
+        //     $this->_updateUserChannel($intUserId, $post['user_channel']);
+        // }
 
-        /*
-        $mqData = $post;
-        $mqData['ad_user_id'] = $intUserId;
-        $mqData['logid'] = $logid;
-        $mqData['ip_address'] = isset($_SERVER['HTTP_CLIENTIP']) ? $_SERVER['HTTP_CLIENTIP'] : '';
-        $mqData['opt_user_id'] = isset($_SERVER['HTTP_OPTUSERID']) ? $_SERVER['HTTP_OPTUSERID'] : 0;
 
-        CEmqPublisher::send(
-            Yii::app()->params['exchange']['updateUserEapi'],
-            __CLASS__ . '_' . __FUNCTION__,
-            json_encode($mqData),
-            $logid,
-            Yii::app()->params['emq']
-        );
-         */
+        $this->getView()->assign("errno", EAPI_SUCCESS);
+        $this->getView()->assign("data", 'ok');
 
-        return array(
-            'errno' => DJAPI_EC_SUCCESS,
-            'data' => 'ok'
-        );
+        // return array(
+        //     'errno' => DJAPI_EC_SUCCESS,
+        //     'data' => 'ok'
+        // );
     }
 
     public function updateUserAction()

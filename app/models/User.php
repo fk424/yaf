@@ -4,11 +4,15 @@ class UserModel extends ModelDj
 {
     protected $_cache_map = array(
         'getUserInfo'=> 'detail',
+        'updateDetail'=> 'detail',
         'getChannel'=> 'channel',
         );
     protected $_cache_func = array(
         'getUserInfo_cache',
         'getChannel_cache',
+        );
+    protected $_decache_func = array(
+        'updateDetail_decache',
         );
     protected $_key_prefix = 'user';
 
@@ -26,6 +30,64 @@ class UserModel extends ModelDj
     public $show_type = array(self::SHOW_TEXT, self::SHOW_IMG, self::SHOW_GOODS, self::SHOW_TUAN);
     public $assist_type = array(self::ASSIST_SEARCH);
 
+    static public function checkParams($params, $keys = null)
+    {
+        if (!is_null($keys))
+        {
+            foreach ($params as $k => $v)
+            {
+                if (!in_array($k, $keys))
+                {
+                    unset($params[$k]);
+                }
+            }
+        }
+        foreach ($params as $k => $v)
+        {
+            switch ($k) {
+                case 'userId':
+                    Checker::assert_int($v, EAPI_PARAM_USER_ID_INVALID);
+                    break;
+                case 'companyAddress':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_COMPANY_ADDRESS_TOO_LONG, 120);
+                    break;
+                case 'contracter':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_CONTRACTER_TOO_LONG, 8);
+                    break;
+                case 'email':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_EMAIL_TOO_LONG, 50);
+                    Checker::assert_regex($v, EAPI_PARAM_USER_EMAIL_INVALID_EMAIL, 'email');
+                    break;
+                case 'contracterPhone':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_CONTRACTER_PHONE_INVALID_PHONE, 13);
+                    Checker::assert_regex($v, EAPI_PARAM_USER_CONTRACTER_PHONE_INVALID_PHONE, 'phone');
+                    break;
+                case 'mobile':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_MOBILE_INVALID_MOBILE, 13);
+                    Checker::assert_regex($v, EAPI_PARAM_USER_MOBILE_INVALID_MOBILE, 'mobile');
+                    break;
+                case 'website':
+                    break;
+                case 'companyName':
+                    break;
+                case 'userIndustry':
+                    break;
+                case 'areaId':
+                    break;
+                case 'clientCategory':
+                    break;
+                case 'userCategory':
+                    break;
+                case 'allowWebsite':
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        return $params;
+
+    }
 
     public function getUserInfo($uid)
     {
@@ -97,16 +159,7 @@ class UserModel extends ModelDj
         $res = Utility::edcApiPost('edc/user/updatebyid', $data);
 
         if ($res['errno'] == 0) {
-            $redis = Yii::app()->openApiMaster;
-            $key = 'eapi_user_detail_' . $intUserId;
-            $redis->delete($key);
-
-            return array(
-                'errno' => DJAPI_EC_SUCCESS,
-                'data' => array(
-                    'affectedRecords' => 1
-                )
-            );
+            return 0;
         }
         throw new DjApiException(DJAPI_EC_DATABASE);
     }
