@@ -15,19 +15,19 @@ Class UserTestify{
         tf()->test(__CLASS__.' '.__FUNCTION__, function(){
             $response = requestActionAndParseBody('user','getDetail', array('userId'=>'a'));
             $data     = json_decode($response, TRUE);
-            tf()->assertEquals(10102, $data['errno']);
+            tf()->assertEquals(EAPI_PARAM_USER_ID_INVALID, $data['errno']);
         });
 
         //缺少userId参数
         tf()->test(__CLASS__.' '.__FUNCTION__, function(){
             $response = requestActionAndParseBody('user','getDetail', array('userId'=>''));
             $data     = json_decode($response, TRUE);
-            tf()->assertEquals(10101, $data['errno']);
+            tf()->assertEquals(EAPI_PARAM_USER_ID_NULL, $data['errno']);
         });
         tf()->test(__CLASS__.' '.__FUNCTION__, function(){
             $response = requestActionAndParseBody('user','getDetail', array());
             $data     = json_decode($response, TRUE);
-            tf()->assertEquals(10101, $data['errno']);
+            tf()->assertEquals(EAPI_PARAM_USER_ID_NULL, $data['errno']);
         });
 
 

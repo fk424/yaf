@@ -13,18 +13,18 @@ Class UserTest extends PHPUnit_Framework_TestCase {
         $response = requestActionAndParseBody('user','getDetail');
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
-        $this->assertEquals(10101, $data['errno']);
+        $this->assertEquals(EAPI_PARAM_USER_ID_NULL, $data['errno']);
 
         $response = requestActionAndParseBody('user','getDetail', array('userId' =>''));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
-        $this->assertEquals(10101, $data['errno']);
+        $this->assertEquals(EAPI_PARAM_USER_ID_NULL, $data['errno']);
 
         $response = requestActionAndParseBody('user', 'getDetail', array('userId' =>'a'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
-        $this->assertEquals(10102, $data['errno']);
+        $this->assertEquals(EAPI_PARAM_USER_ID_INVALID, $data['errno']);
 
     }
- 
+
 }

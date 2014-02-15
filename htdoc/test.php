@@ -2,6 +2,8 @@
 error_reporting(E_ALL);
 define ("BASE_PATH", dirname(__FILE__) . "/../");
 define ("APPLICATION_PATH", BASE_PATH . "app");
+define ("CONFIG_PATH", BASE_PATH . "conf/");
+
 define ("CASE_PATH", BASE_PATH . "tests");
 define ("COVERAGE_PATH", BASE_PATH . "htdoc/coverage");
 

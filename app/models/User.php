@@ -67,18 +67,26 @@ class UserModel extends ModelDj
                     Checker::assert_regex($v, EAPI_PARAM_USER_MOBILE_INVALID_MOBILE, 'mobile');
                     break;
                 case 'website':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_WEBSITE_TOO_LONG, 255);
+                    Checker::assert_regex($v, EAPI_PARAM_USER_WEBSITE_INVALID_URL, 'url');
                     break;
                 case 'companyName':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_COMPANY_NAME_TOO_LONG, 80);
                     break;
                 case 'userIndustry':
+                    Checker::assert_int($v, EAPI_PARAM_USER_USER_INDUSTRY_INVALID);
                     break;
                 case 'areaId':
+                    Checker::assert_int($v, EAPI_PARAM_USER_AREA_ID_INVALID);
                     break;
                 case 'clientCategory':
+                    Checker::assert_int($v, EAPI_PARAM_USER_CLIENT_CATEGORY_INVALID);
                     break;
                 case 'userCategory':
+                    Checker::assert_int($v, EAPI_PARAM_USER_USER_CATEGORY_INVALID);
                     break;
                 case 'allowWebsite':
+                    Checker::assert_strlen($v, EAPI_PARAM_USER_ALLOW_WEBSITE_TOO_LONG, 255);
                     break;
                 default:
                     break;
