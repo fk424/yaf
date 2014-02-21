@@ -27,7 +27,7 @@ try {
 		->run()/*执行*/;	
 }
 catch (Exception $e) {
-	$response = ErrorHandler::handleException($e);
+	$response = Eapi_ErrorHandler::handleException($e);
 }
 echo "\ncost time:", $benchmark->cost(), 'ms';
 echo "\nmemory:", $benchmark->memory(), 'byte';

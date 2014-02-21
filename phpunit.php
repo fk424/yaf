@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL);
+error_reporting(E_ERROR);
 
 require_once 'Mockery/Loader.php';
 
@@ -26,7 +26,7 @@ $application = new Yaf_Application("conf/main.ini");
                 ->dispatch($request);
         }
         catch (Exception $e) {
-            $response = ErrorHandler::handleException($e);
+            $response = Eapi_ErrorHandler::handleException($e);
         }
         return $response->getBody();
     }

@@ -14,14 +14,7 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 		defined('YAF_ENABLE_ERROR_HANDLER') or define('YAF_ENABLE_ERROR_HANDLER',true);
 		defined('YAF_DEBUG') or define('YAF_DEBUG',true);
 		defined('YAF_TRACE_LEVEL') or define('YAF_TRACE_LEVEL',3);
-	}
-	protected function _initSystemHandlers()
-	{
-//		ErrorHandler::initHandler();
-	}
-
-	public function _initSession($dispatcher) {
-//		Yaf_Session::getInstance()->start();
+		require_once(APPLICATION_PATH . '/library/Eapi/Errno.php');
 	}
 
 	public function _initConfig() {
@@ -30,22 +23,14 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 	}
 
 	public function _initLibrary() {
-		require_once(APPLICATION_PATH . '/library/DjApiErrorDescs.php');
 	}
 
 	public function _initPlugin(Yaf_Dispatcher $dispatcher) {
 		$user = new UserPlugin();
 		$dispatcher->registerPlugin($user);
 	}
-	public function _initRedis() {
-		$redis = new CRedis();
-		$redis->init();
-		Yaf_Registry::set("redis", $redis->getInstance());
-	}
 
 	public function _initView(Yaf_Dispatcher $dispatcher) {
-    	$view= new JsonView();
-    	Yaf_Dispatcher::getInstance()->setView($view);
     }
 
 }

@@ -157,23 +157,6 @@ class Curl
         }
     }
 
-    /*
-     * 兼容老代码  建议使用 get/post
-     */
-    public static function run($url, $method=true, $postData=array()){
-        if( empty($url) )
-            throw new CException( Yii::t('Curl', 'You must set Url.') );
-
-        if( $method ){
-            $res = self::get($url);
-        }
-        else {
-            $res = self::post($url, $postData);
-        }
-
-        return $res;
-    }
-
     protected static function buildQuery($postData)
     {
         return http_build_query($postData, null, '&');

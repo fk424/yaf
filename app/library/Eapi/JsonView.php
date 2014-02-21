@@ -1,6 +1,6 @@
 <?php
 
-class JsonView implements Yaf_View_Interface
+class Eapi_JsonView implements Yaf_View_Interface
 {
     public $data = array();
 

@@ -40,7 +40,7 @@ function tf(){
                 ->dispatch($request);
         }
         catch (Exception $e) {
-            $response = ErrorHandler::handleException($e);
+            $response = Eapi_ErrorHandler::handleException($e);
         }
         return $response->getBody();
     }
@@ -157,7 +157,7 @@ class Test
 			foreach ($methods as $m){
 				if(substr($m, 0, 4) == 'test'){
 					$result[] = $m;
-				}				
+				}
 			}
 			return $result;
 		}else if(method_exists($class_name, $method_name)){

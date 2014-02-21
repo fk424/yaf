@@ -1,5 +1,5 @@
 <?php
-class ErrorHandler {
+class Eapi_ErrorHandler {
 
 	public static function initHandler(){
 		if(YAF_ENABLE_EXCEPTION_HANDLER)
@@ -17,7 +17,7 @@ class ErrorHandler {
 
 		$exception_type = get_class($e);
 		switch ($exception_type) {
-			case "DjApiException":
+			case "Eapi_Exception":
             	$intErrno = $e->getCode();
             	$strErrmsg = $e->getMessage();
             	$strErrdesc = $e->getDesc();

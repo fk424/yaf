@@ -2,6 +2,23 @@
 
 class Utility
 {
+    public static function array_sort($arr,$keys,$type='asc'){ 
+        $keysvalue = $new_array = array();
+        foreach ($arr as $k=>$v){
+            $keysvalue[$k] = $v[$keys];
+        }
+        if($type == 'asc'){
+            asort($keysvalue);
+        }else{
+            arsort($keysvalue);
+        }
+        reset($keysvalue);
+        foreach ($keysvalue as $k=>$v){
+            $new_array[$k] = $arr[$k];
+        }
+        return $new_array;
+    }
+
     public static function edcApiPost ($url, $data)
     {
         $config = Yaf_Registry::get('config');
@@ -14,7 +31,7 @@ class Utility
         }
         $data['ip_address'] = isset($_SERVER['HTTP_CLIENTIP']) ? $_SERVER['HTTP_CLIENTIP'] : '';
         $data['opt_user_id'] = isset($_SERVER['HTTP_OPTUSERID']) ? $_SERVER['HTTP_OPTUSERID'] : 0;
-        $raw = Curl::run($config->api->edc->url . $url  . '?logid='.self::$logid, false, self::makeClientSign($data));
+        $raw = Curl::post($config->api->edc->url . $url  . '?logid='.self::$logid, self::makeClientSign($data));
         $res = json_decode($raw, true);
         if (! isset($res['errno'])) {
             $res['errno'] = 1;
@@ -44,11 +61,11 @@ class Utility
         $params['appkey'] = $edcConfig['appkey'];
         $params['ver'] = $edcConfig['ver'];
         $g_params = Yaf_Registry::get('params');
-        $userId = isset($g_params['userId']) ? $g_params['userId'] : '';
+        $splitId = isset($g_params['splitId']) ? $g_params['splitId'] : '';
         if (isset($params['forceToken'])) {
             $strToken = $params['forceToken'];
         } else {
-            $strToken = $userId;
+            $strToken = $splitId;
             $strToken .= implode($params);
             $strToken = md5($strToken);
         }
@@ -63,7 +80,7 @@ class Utility
         }
         $params['token'] = sha1($strToken);
 
-        $params['splitId'] =$userId;
+        $params['splitId'] =$splitId;
 
         $res = array();
         foreach ($params as $k => $v) {
@@ -135,7 +152,7 @@ class Utility
             'c' => $table,
             'g' => 'eapi_monitor_mailonly'
         );
-        Curl::run($mailApi, false, $data);
+        Curl::post($mailApi, $data);
         return true;
     }
 
@@ -150,10 +167,10 @@ class Utility
     static public function CException($errno = 0, $description = '') 
     {
         if (YII_DEBUG) {
-            throw new DjApiException($errno, $description);
+            throw new Eapi_Exception($errno, $description);
         }
 
-        $message = isset(DjApiErrorDescs::$_arrSysOpenApiError[$errno]) ? DjApiErrorDescs::$_arrSysOpenApiError[$errno] : '';
+        $message = isset(Eapi_ErrorDescs::$_arrSysOpenApiError[$errno]) ? DjApiErrorDescs::$_arrSysOpenApiError[$errno] : '';
         $result = array(
             'errno' => $errno,
             'data'  => array(

@@ -6,6 +6,7 @@
 class UserPlugin extends Yaf_Plugin_Abstract {
 
 	public function routerStartup(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
+
 //		echo "Plugin routerStartup called <br/>\n";
 
 //		echo "Request with base uir:" . $request->getBaseUri() . "<br/>\n";
@@ -23,10 +24,20 @@ class UserPlugin extends Yaf_Plugin_Abstract {
 	}
 
 	public function dispatchLoopStartup(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
+		if (($request->getControllerName() != 'Index') && ($request->getActionName() != 'index')) {
+	    	$view = new Eapi_JsonView();
+    		Yaf_Dispatcher::getInstance()->setView($view);
+    		Yaf_Registry::set('view','json');
+		} else {
+			Yaf_Dispatcher::getInstance()->autoRender(FALSE);
+    		Yaf_Registry::set('view','simple');
+		}
+
 //		echo "Plugin DispatchLoopStartup called <br/>\n";
 	}
 
 	public function preDispatch(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
+//		print_r($request);
 //		$params = $_GET + $_POST;
 		$params = $request->getQuery() + $request->getPost();
 		$params = $params + Yaf_Dispatcher::getInstance()->getRequest()->getParams();
@@ -39,14 +50,20 @@ class UserPlugin extends Yaf_Plugin_Abstract {
 	}
 
 	public function dispatchLoopShutdown(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {
-		$method = $request->getMethod();
-		switch ($method) {
-			case 'CLI':
-				break;
-			case 'TEST':
+		switch (Yaf_Registry::get('view')) {
+			case 'json':
+				$method = $request->getMethod();
+				switch ($method) {
+					case 'CLI':
+						break;
+					case 'TEST':
+						break;
+					default:
+						header('Content-type: application/json;charset=utf-8');
+						break;
+				}
 				break;
 			default:
-				header('Content-type: application/json;charset=utf-8');
 				break;
 		}
 

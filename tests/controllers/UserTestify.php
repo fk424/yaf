@@ -30,7 +30,6 @@ Class UserTestify{
             tf()->assertEquals(EAPI_PARAM_USER_ID_NULL, $data['errno']);
         });
 
-
     }
  
 }

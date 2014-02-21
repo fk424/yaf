@@ -1,14 +1,13 @@
 <?php
-//file:webapp/protected/extensions/CRedis.php
 
-class CRedis
+class CRedis extends Singleton
 {
     /**
      * class from php redis extension
      * @link https://github.com/ukko/phpredis-phpdoc
      * @var Redis
      */
-    private $redis;
+    static private $_redis = array('master' => '', 'slave' =>'');
 
     public $host;
     /**
@@ -18,36 +17,43 @@ class CRedis
     public $intTryTime = 3;
     public $intTryInterval = 100; //尝试间隔为100微妙
 
-    public function __construct()
+    public function __construct($obj = 'master')
     {
         $this->redis = new Redis();
-    }
-    public function init()
-    {
-        $config = new Yaf_Config_Simple(include(CONFIG_PATH . '/redis.php'));
-        Yaf_Registry::set("redis_config", $config);
-
+        if (!($config = Yaf_Registry::get("redis_config"))) {
+            $config = new Yaf_Config_Simple(include(CONFIG_PATH . '/redis.php'));
+            Yaf_Registry::set("redis_config", $config);
+        }
         if ($conf = $config->host) {
-            if ($this->connect($conf['host'], $conf['port'], $conf['timeout'])) {
-                Yii::log('redis connect to stat:' . print_r($conf, true));
+            if (!$this->connect($conf['host'], $conf['port'], $conf['timeout'])) {
+                throw new Eapi_Exception(EAPI_REDIS_DISCONNECT);
+            }
+        }
+        elseif ($obj == 'master') {
+            $master = $config->master;
+            if (!$this->connect($master['host'], $master['port'], $master['timeout'])) {
+                throw new Eapi_Exception(EAPI_REDIS_DISCONNECT);
             }
         }
         else {
-            $master = $config->master;
-            if ($this->connect($master['host'], $master['port'], $master['timeout'])) {
-//                Yii::log('redis connect to master:' . print_r($master, true));
-            }
-            else {
+            $slave = $config->slave;
+            if (!$this->connect($slave['host'], $slave['port'], $slave['timeout'])) {
+                throw new Eapi_Exception(EAPI_REDIS_DISCONNECT);
             }
         }
-	}
-
-    public function getInstance()
-    {
         return $this->redis;
     }
 
-    public function connect($host, $port=6379, $timeout=false)
+    static public function getInstance($obj = 'master')
+    {
+        if (!(self::$_redis[$obj] instanceof CRedis)){
+            $_instance = new CRedis;
+            self::$_redis[$obj] = $_instance;
+        }
+        return self::$_redis[$obj];
+    }
+
+    private function connect($host, $port=6379, $timeout=false)
     {
         try {
             if ($host{0} == '/') {//unix domain socket
