@@ -41,6 +41,7 @@ class UserPlugin extends Yaf_Plugin_Abstract {
 //		$params = $_GET + $_POST;
 		$params = $request->getQuery() + $request->getPost();
 		$params = $params + Yaf_Dispatcher::getInstance()->getRequest()->getParams();
+		ksort($params);
 		Yaf_Registry::set("params", $params);
 //		echo "Plugin PreDispatch called <br/>\n";
 	}

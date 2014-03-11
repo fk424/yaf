@@ -10,5 +10,4 @@ return array(
 			'port' => 6379,
 			'timeout' => false,
 		),
-
 );

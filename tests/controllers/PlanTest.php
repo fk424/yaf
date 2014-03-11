@@ -1,56 +1,50 @@
 <?php
-Class PlanTest extends PHPUnit_Framework_TestCase {
-
-    private function generalParamTest($function) {
-        //参数校验
-        $response = requestActionAndParseBody('plan',$function);
-        $data     = json_decode($response, TRUE);
-        $this->assertInternalType('array', $data);
-        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
-
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>''));
-        $data     = json_decode($response, TRUE);
-        $this->assertInternalType('array', $data);
-        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
-
-        $response = requestActionAndParseBody('plan', $function, array('splitId' =>'a'));
-        $data     = json_decode($response, TRUE);
-        $this->assertInternalType('array', $data);
-        $this->assertEquals(EAPI_PARAM_SPLIT_ID_INVALID, $data['errno']);
-    }
-
-    private function generalBusinessTest($function) {
-        $response = requestActionAndParseBody('plan', $function, array('splitId' =>2480646281));
-        $data     = json_decode($response, TRUE);
-        $this->assertInternalType('array', $data);
-        $this->assertEquals(EAPI_USER_NOT_EXIST, $data['errno']);
-    }
+Class PlanTest extends Yaf_Controller_TestCase {
 
     /**
      */
     public function testgetInfoAction() {
-        $function = substr(substr(__FUNCTION__, 4), 0, -6);
+        $controller = self::getController();
+        $action = self::getAction(__FUNCTION__);
 
         //参数校验
-        $this->generalParamTest($function);
+        $response = requestActionAndParseBody($controller,$action);
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
 
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628'));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' => null));
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
+
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>''));
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
+
+        $response = requestActionAndParseBody($controller, $action, array('planId' => '1','splitId' =>'a'));
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_INVALID, $data['errno']);
+
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(EAPI_PARAM_PLAN_ID_NULL, $data['errno']);
 
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628', 'planId' => ''));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628', 'planId' => ''));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(EAPI_PARAM_PLAN_ID_NULL, $data['errno']);
 
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628', 'planId' => 'a'));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628', 'planId' => 'a'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(EAPI_PARAM_PLAN_ID_INVALID, $data['errno']);
 
         //业务校验
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628', 'planId' => '300237492'));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628', 'planId' => '300237492'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(EAPI_PLAN_NOT_EXIST, $data['errno']);
@@ -58,7 +52,7 @@ Class PlanTest extends PHPUnit_Framework_TestCase {
         //todo: 计划被删除
         //todo: splitId错误
         //返回值格式校验
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628', 'planId' => '30023749'));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628', 'planId' => '30023749'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(0, $data['errno']);
@@ -66,21 +60,41 @@ Class PlanTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testgetInfosAction() {
-        $function = substr(substr(__FUNCTION__, 4), 0, -6);
+        $controller = self::getController();
+        $action = self::getAction(__FUNCTION__);
 
         //参数校验
-        $this->generalParamTest($function);
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628'));
+        $response = requestActionAndParseBody($controller,$action);
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
+
+        $response = requestActionAndParseBody($controller,$action, array('splitId' => null));
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
+
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>''));
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_NULL, $data['errno']);
+
+        $response = requestActionAndParseBody($controller, $action, array('planIds' => '[1]','splitId' =>'a'));
+        $data     = json_decode($response, TRUE);
+        $this->assertInternalType('array', $data);
+        $this->assertEquals(EAPI_PARAM_SPLIT_ID_INVALID, $data['errno']);
+
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(EAPI_PARAM_PLAN_IDS_NULL, $data['errno']);
 
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628', 'planIds' => ''));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628', 'planIds' => ''));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(EAPI_PARAM_PLAN_IDS_NULL, $data['errno']);
 
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628', 'planIds' => 'a'));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628', 'planIds' => 'a'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(EAPI_PARAM_PLAN_IDS_INVALID, $data['errno']);
@@ -88,7 +102,7 @@ Class PlanTest extends PHPUnit_Framework_TestCase {
         //业务校验
         
         //返回值格式校验
-        $response = requestActionAndParseBody('plan',$function, array('splitId' =>'248064628', 'planIds' => '[30023749,30023750]'));
+        $response = requestActionAndParseBody($controller,$action, array('splitId' =>'248064628', 'planIds' => '[30023749,30023750]'));
         $data     = json_decode($response, TRUE);
         $this->assertInternalType('array', $data);
         $this->assertEquals(0, $data['errno']);

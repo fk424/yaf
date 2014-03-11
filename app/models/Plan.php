@@ -38,6 +38,60 @@ class PlanModel extends Eapi_ModelBase
     const PLAN_STATUS_PAUSE  = 0;
     const PLAN_STATUS_DELETE = -1;
 
+    static public function checkParams($params, $keys = null)
+    {
+        $params = parent::checkParams($params, $keys);//print_r($params);die('sdf');
+        foreach ($params as $k => $v)
+        {
+            switch ($k) {
+                case 'companyAddress':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_COMPANY_ADDRESS_TOO_LONG, 120);
+                    break;
+                case 'contracter':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_CONTRACTER_TOO_LONG, 8);
+                    break;
+                case 'email':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_EMAIL_TOO_LONG, 50);
+                    Eapi_Checker::assert_regex($v, EAPI_PARAM_USER_EMAIL_INVALID_EMAIL, 'email');
+                    break;
+                case 'contracterPhone':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_CONTRACTER_PHONE_INVALID_PHONE, 13);
+                    Eapi_Checker::assert_regex($v, EAPI_PARAM_USER_CONTRACTER_PHONE_INVALID_PHONE, 'phone');
+                    break;
+                case 'mobile':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_MOBILE_INVALID_MOBILE, 13);
+                    Eapi_Checker::assert_regex($v, EAPI_PARAM_USER_MOBILE_INVALID_MOBILE, 'mobile');
+                    break;
+                case 'website':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_WEBSITE_TOO_LONG, 255);
+                    Eapi_Checker::assert_regex($v, EAPI_PARAM_USER_WEBSITE_INVALID_URL, 'url');
+                    break;
+                case 'companyName':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_COMPANY_NAME_TOO_LONG, 80);
+                    break;
+                case 'userIndustry':
+                    Eapi_Checker::assert_int($v, EAPI_PARAM_USER_USER_INDUSTRY_INVALID);
+                    break;
+                case 'areaId':
+                    Eapi_Checker::assert_int($v, EAPI_PARAM_USER_AREA_ID_INVALID);
+                    break;
+                case 'clientCategory':
+                    Eapi_Checker::assert_int($v, EAPI_PARAM_USER_CLIENT_CATEGORY_INVALID);
+                    break;
+                case 'userCategory':
+                    Eapi_Checker::assert_int($v, EAPI_PARAM_USER_USER_CATEGORY_INVALID);
+                    break;
+                case 'allowWebsite':
+                    Eapi_Checker::assert_strlen($v, EAPI_PARAM_USER_ALLOW_WEBSITE_TOO_LONG, 255);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        return $params;
+
+    }
     public function getInfosByUserId ($uid)
     {
         $postData = array(

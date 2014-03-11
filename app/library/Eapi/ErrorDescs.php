@@ -6,6 +6,7 @@ class Eapi_ErrorDescs
     public static $_arrSysOpenApiError = array(
         EAPI_SUCCESS => 'ok',
 
+        EAPI_OPTIONAL_PARAM_NULL => 'Optional Param is null',
         EAPI_PARAM_SPLIT_ID_NULL => 'Param splitId is null',
         EAPI_PARAM_SPLIT_ID_INVALID => 'Param splitId is invalid',
 
@@ -26,6 +27,9 @@ class Eapi_ErrorDescs
         EAPI_PARAM_USER_CLIENT_CATEGORY_INVALID => 'Param clientCategory is invalid',
         EAPI_PARAM_USER_USER_CATEGORY_INVALID => 'Param userCategory is invalid',
         EAPI_PARAM_USER_ALLOW_WEBSITE_TOO_LONG => 'Param allowWebsite is too long',
+
+        EAPI_PARAM_USER_STATUS_NULL => 'Param status is null',
+        EAPI_PARAM_USER_STATUS_INVALID => 'Param status is invalid',
 
         EAPI_PARAM_PLAN_ID_NULL => 'Param planId is null',
         EAPI_PARAM_PLAN_ID_INVALID => 'Param planId is invalid',

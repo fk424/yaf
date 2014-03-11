@@ -13,72 +13,6 @@ class Eapi_Checker
 		'mobile' => '/^[(86)|0]?(13\d{9})|(15\d{9})|(18\d{9})$/',
 		);
 
-    static public function checkParams($params, $keys = null)
-    {
-        if (!is_null($keys))
-        {
-            foreach ($params as $k => $v)
-            {
-                if (!in_array($k, $keys))
-                {
-                    unset($params[$k]);
-                }
-            }
-        }
-        foreach ($params as $k => $v)
-        {
-            switch ($k) {
-                case 'userId':
-                    self::assert_int($v, EAPI_PARAM_USER_ID_INVALID);
-                    break;
-                case 'companyAddress':
-                    self::assert_strlen($v, EAPI_PARAM_USER_COMPANY_ADDRESS_TOO_LONG, 120);
-                    break;
-                case 'contracter':
-                    self::assert_strlen($v, EAPI_PARAM_USER_CONTRACTER_TOO_LONG, 8);
-                    break;
-                case 'email':
-                    self::assert_strlen($v, EAPI_PARAM_USER_EMAIL_TOO_LONG, 50);
-                    self::assert_regex($v, EAPI_PARAM_USER_EMAIL_INVALID_EMAIL, 'email');
-                    break;
-                case 'contracterPhone':
-                    self::assert_strlen($v, EAPI_PARAM_USER_CONTRACTER_PHONE_INVALID_PHONE, 13);
-                    self::assert_regex($v, EAPI_PARAM_USER_CONTRACTER_PHONE_INVALID_PHONE, 'phone');
-                    break;
-                case 'mobile':
-                    self::assert_strlen($v, EAPI_PARAM_USER_MOBILE_INVALID_MOBILE, 13);
-                    self::assert_regex($v, EAPI_PARAM_USER_MOBILE_INVALID_MOBILE, 'mobile');
-                    break;
-                case 'website':
-                    self::assert_strlen($v, EAPI_PARAM_USER_WEBSITE_TOO_LONG, 255);
-                    self::assert_regex($v, EAPI_PARAM_USER_WEBSITE_INVALID_URL, 'url');
-                    break;
-                case 'companyName':
-                    self::assert_strlen($v, EAPI_PARAM_USER_COMPANY_NAME_TOO_LONG, 80);
-                    break;
-                case 'userIndustry':
-                    self::assert_int($v, EAPI_PARAM_USER_USER_INDUSTRY_INVALID);
-                    break;
-                case 'areaId':
-                    self::assert_int($v, EAPI_PARAM_USER_AREA_ID_INVALID);
-                    break;
-                case 'clientCategory':
-                    self::assert_int($v, EAPI_PARAM_USER_CLIENT_CATEGORY_INVALID);
-                    break;
-                case 'userCategory':
-                    self::assert_int($v, EAPI_PARAM_USER_USER_CATEGORY_INVALID);
-                    break;
-                case 'allowWebsite':
-                    self::assert_strlen($v, EAPI_PARAM_USER_ALLOW_WEBSITE_TOO_LONG, 255);
-                    break;
-                default:
-                    break;
-            }
-
-        }
-        return $params;
-
-    }
 	public static function getParam($key, $exception_code = 0, $default = 0)
 	{
         $params = Yaf_Registry::get("params");
@@ -101,6 +35,33 @@ class Eapi_Checker
 		return $v;
 	}
 
+	public static function assert_trans($old, $new, $trans, $exception_code = 0) {
+		if (isset($trans[$old]) && is_array($trans[$old]) && in_array($new, $trans))
+		{
+			return true;
+		} else {
+			throw new Eapi_Exception($exception_code);
+		}
+	}
+
+	public static function assert_enum($v, $exception_code = 0, $enum_arr)
+	{
+        $bool = (!is_int($v) ? (ctype_digit($v)) : true);
+        if ($bool) {
+        	if (!in_array($v, $enum_arr)){
+				throw new Eapi_Exception($exception_code);
+        	}
+        } else {
+        	if (!array_key_exists($v, $enum_arr)) {
+				throw new Eapi_Exception($exception_code);
+        	} else {
+        		$v = $enum_arr[$v];
+        	}
+        }
+        return $v;
+	}
+
+
 	public static function assert_int($v, $exception_code = 0)
 	{
         $bool = (!is_int($v) ? (ctype_digit($v)) : true);
@@ -113,6 +74,14 @@ class Eapi_Checker
         }
         return $v;
 	}
+
+    public static function assert_empty_array($v, $exception_code)
+    {
+        if (!is_array($v) || (count($v) == 0)){
+            throw new Eapi_Exception($exception_code);
+        }
+        return $v;
+    }
 
 	public static function assert_json($v, $exception_code)
 	{

@@ -6,6 +6,43 @@ abstract class Eapi_ModelBase extends Singleton {
 //	protected $_cache_map;
 //	protected $_key_prefix;
 
+    static public function checkParams($params, $keys = null)
+    {
+        if (!is_null($keys))
+        {
+            foreach ($params as $k => $v)
+            {
+                if (!in_array($k, $keys))
+                {
+                    unset($params[$k]);
+                }
+            }
+        }
+        Eapi_Checker::assert_empty_array($params, EAPI_OPTIONAL_PARAM_NULL);
+        foreach ($params as $k => $v)
+        {
+            switch ($k) {
+                case 'userId':
+                    Eapi_Checker::assert_int($v, EAPI_PARAM_USER_ID_INVALID);
+                    break;
+                case 'splitId':
+                    Eapi_Checker::assert_int($v, EAPI_PARAM_SPLIT_ID_INVALID);
+                    break;
+                case 'planId':
+                    Eapi_Checker::assert_int($v, EAPI_PARAM_PLAN_ID_INVALID);
+                    break;
+                case 'planIds':
+                    Eapi_Checker::assert_json($v, EAPI_PARAM_PLAN_IDS_INVALID);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        return $params;
+
+    }
+
 	public function __call($name, $args)
 	{
 		$arr = explode('_', $name);
@@ -33,22 +70,25 @@ abstract class Eapi_ModelBase extends Singleton {
 			$args = array($args);
 		}
 
-		if (Yaf_Application::app()->getConfig()->enableCache) {
-			$key_ttl = $this->getKey($func, $args, 'cache');
-			$key = $key_ttl[0];
-			$ttl = isset($key_ttl[1]) ? $key_ttl[1] : $this->_ttl;
+		$key_ttl = $this->getKey($func, $args, 'cache');
+		$key = $key_ttl[0];
+		$ttl = isset($key_ttl[1]) ? $key_ttl[1] : $this->_ttl;
 
-			$redis = CRedis::getinstance();
-        	$data = $redis->get($key);
-            $data = unserialize($data);
+//		if (!($data = Yaf_Registry::get($key))){
+			if (Yaf_Application::app()->getConfig()->enableCache) {
+				$redis = CRedis::getinstance();
+    	    	$data = $redis->get($key);
+        	    $data = unserialize($data);
 
-			if (!$data) {
+				if (!$data) {
+					$data = call_user_func_array(array($this, $func), $args);
+					$redis->setex($key, $ttl, serialize($data));
+				}
+			} else {
 				$data = call_user_func_array(array($this, $func), $args);
-				$redis->setex($key, $ttl, serialize($data));
 			}
-		} else {
-			$data = call_user_func_array(array($this, $func), $args);
-		}
+//			Yaf_Registry::set($key, $data);
+//		}
 		return $data;
 	}
 
@@ -94,7 +134,6 @@ abstract class Eapi_ModelBase extends Singleton {
 		if (!is_array($args)) {
 			$args = array($args);
 		}
-
 		if (Yaf_Application::app()->getConfig()->enableCache) {
 			$keys = $this->getKey($func, $args, 'decache');
 			$redis = CRedis::getinstance();
